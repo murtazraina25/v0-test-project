@@ -1,18 +1,36 @@
-export interface DataSource {
+export interface ConnectedAccount {
   id: string
-  name: string
-  type: "email" | "cloud"
-  provider: "gmail" | "outlook" | "yahoo" | "google-drive" | "onedrive" | "custom-email"
-  icon: string
-  requiresOAuth: boolean
-  status: "connected" | "disconnected" | "error"
+  providerId: string // gmail, outlook, google-drive, etc.
+  providerName: string
+  accountName: string // email address or account identifier
+  accountType: "email" | "cloud"
+  status: "connected" | "error" | "syncing"
   lastSync?: Date
-  email?: string
+  syncConfig: AccountSyncConfig
 }
 
-export interface SyncConfig {
-  interval: "6h" | "12h" | "24h" | "48h"
+export interface AccountSyncConfig {
+  enabled: boolean
+  syncInterval: "15m" | "30m" | "1h" | "6h" | "12h" | "24h"
+  folders?: FolderConfig[] // for email accounts
+  directories?: DirectoryConfig[] // for cloud storage
   documentTypes: DocumentType[]
+}
+
+export interface FolderConfig {
+  id: string
+  name: string
+  path: string
+  enabled: boolean
+  lastSync?: Date
+}
+
+export interface DirectoryConfig {
+  id: string
+  name: string
+  path: string
+  enabled: boolean
+  lastSync?: Date
 }
 
 export interface DocumentType {
@@ -21,15 +39,12 @@ export interface DocumentType {
   enabled: boolean
 }
 
-export interface IMAPConfig {
-  email: string
-  password: string
-  server: string
-  port: number
-  ssl: boolean
-}
-
-export interface ConnectedSource extends DataSource {
-  syncConfig: SyncConfig
-  imapConfig?: IMAPConfig
+export interface Provider {
+  id: string
+  name: string
+  type: "email" | "cloud" | "both"
+  icon: string
+  requiresOAuth: boolean
+  supportsFolders: boolean
+  supportsDirectories: boolean
 }
